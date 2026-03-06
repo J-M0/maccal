@@ -19,8 +19,9 @@ class CalendarAccessDeniedError(Exception):
 class CalendarStore:
     """Provides access to macOS calendars and events via EventKit.
 
-    On initialization, requests full access to calendar events. Raises
-    CalendarAccessDeniedError if the user declines the permission prompt.
+    On initialization, requests full access to calendar events.
+
+    :raises CalendarAccessDeniedError: if the user declines the permission prompt
     """
 
     SEARCHABLE_FIELDS: list[str] = [
@@ -78,9 +79,8 @@ class CalendarStore:
     ) -> list[Calendar]:
         """List available calendars, optionally filtered by type or source.
 
-        Args:
-            type: Filter by calendar type name (e.g. "local", "caldav", "exchange").
-            source: Filter by source title (e.g. "iCloud", "Gmail").
+        :keyword type: Filter by calendar type name (e.g. "local", "caldav", "exchange").
+        :keyword source: Filter by source title (e.g. "iCloud", "Gmail").
         """
         from .calendars import list_calendars
 
@@ -99,10 +99,9 @@ class CalendarStore:
 
         Recurring events are automatically expanded into individual occurrences.
 
-        Args:
-            start: Start of date range.
-            end: End of date range.
-            calendars: Optional list of calendar names to restrict results.
+        :param start: Start of date range.
+        :param end: End of date range.
+        :keyword calendars: Optional list of calendar names to restrict results.
         """
         from .events import get_events
 
@@ -128,14 +127,13 @@ class CalendarStore:
         Uses lazy filtering: only accesses the ObjC fields needed for matching,
         then fully converts only matching events to dataclasses.
 
-        Args:
-            query: Text to search for.
-            start: Start of date range (required by EventKit).
-            end: End of date range.
-            calendars: Optional list of calendar names to restrict results.
-            fields: Which fields to search. None means all searchable fields.
-                See CalendarStore.SEARCHABLE_FIELDS for valid names.
-            case_sensitive: Whether the search is case-sensitive. Default False.
+        :param query: Text to search for.
+        :param start: Start of date range (required by EventKit).
+        :param end: End of date range.
+        :param calendars: Optional list of calendar names to restrict results.
+        :param fields: Which fields to search. None means all searchable fields.
+                     See CalendarStore.SEARCHABLE_FIELDS for valid names.
+        :param case_sensitive: Whether the search is case-sensitive. Default False.
         """
         from .events import find_events
 
@@ -168,18 +166,17 @@ class CalendarStore:
     ) -> Event:
         """Create a new calendar event.
 
-        Args:
-            title: Event title (required).
-            start: Event start time (required).
-            end: Event end time (required).
-            calendar: Name of target calendar. Uses system default if None.
-            location: Location string.
-            notes: Event notes/description.
-            url: URL associated with the event.
-            is_all_day: Whether this is an all-day event.
-            availability: EventKit availability (0=busy, 1=free, 2=tentative, 3=unavailable).
-            alarms: List of Alarm objects.
-            recurrence: A RecurrenceRule for recurring events.
+        :keyword title: Event title (required).
+        :keyword start: Event start time (required).
+        :keyword end: Event end time (required).
+        :keyword calendar: Name of target calendar. Uses system default if None.
+        :keyword location: Location string.
+        :keyword notes: Event notes/description.
+        :keyword url: URL associated with the event.
+        :keyword is_all_day: Whether this is an all-day event.
+        :keyword availability: EventKit availability (0=busy, 1=free, 2=tentative, 3=unavailable).
+        :keyword alarms: List of Alarm objects.
+        :keyword recurrence: A RecurrenceRule for recurring events.
         """
         from .events import add_event
 
@@ -214,20 +211,19 @@ class CalendarStore:
     ) -> Event:
         """Update an existing calendar event.
 
-        For recurring events, you must specify span and occurrence_date.
-        Omitting occurrence_date on a recurring event raises ValueError.
+        For recurring events, you must specify ``span`` and ``occurrence_date``.
+        Omitting ``occurrence_date`` on a recurring event raises ValueError.
 
-        Args:
-            event_id: The event identifier.
-            title: New title (or None to leave unchanged).
-            start: New start time.
-            end: New end time.
-            location: New location (None to clear, omit to leave unchanged).
-            notes: New notes (None to clear, omit to leave unchanged).
-            url: New URL (None to clear, omit to leave unchanged).
-            is_all_day: New all-day flag.
-            span: For recurring events: "this" or "future".
-            occurrence_date: Which occurrence to modify (required for recurring).
+        :param event_id: The event identifier.
+        :keyword title: New title (or None to leave unchanged).
+        :keyword start: New start time.
+        :keyword end: New end time.
+        :keyword location: New location (None to clear, omit to leave unchanged).
+        :keyword notes: New notes (None to clear, omit to leave unchanged).
+        :keyword url: New URL (None to clear, omit to leave unchanged).
+        :keyword is_all_day: New all-day flag.
+        :keyword span: For recurring events: "this" or "future".
+        :keyword occurrence_date: Which occurrence to modify (required for recurring).
         """
         from .events import update_event
 
@@ -257,10 +253,9 @@ class CalendarStore:
         For recurring events, you must specify span and occurrence_date.
         Omitting occurrence_date on a recurring event raises ValueError.
 
-        Args:
-            event_id: The event identifier.
-            span: For recurring events: "this" or "future".
-            occurrence_date: Which occurrence to delete (required for recurring).
+        :param event_id: The event identifier.
+        :keyword span: For recurring events: "this" or "future".
+        :keyword occurrence_date: Which occurrence to delete (required for recurring).
         """
         from .events import delete_event
 
@@ -286,11 +281,10 @@ class CalendarStore:
         Fetches events, merges busy intervals (ignoring events marked "free"),
         and returns gaps at least as long as the requested duration.
 
-        Args:
-            start: Window start.
-            end: Window end.
-            duration: Minimum slot duration.
-            calendars: Optional list of calendar names to consider.
+        :param start: Window start.
+        :param end: Window end.
+        :param duration: Minimum slot duration.
+        :keyword calendars: Optional list of calendar names to consider.
         """
         from .availability import find_free_time
 
